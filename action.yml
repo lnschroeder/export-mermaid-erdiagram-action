@@ -1,5 +1,5 @@
-name: 'Export MermaidJS erdiagram from DB'
-description: 'Exports entity relationship diagrams from an existing database'
+name: 'Export MermaidJS erdiagrams from database'
+description: 'Exports MermaidJS entity relationship diagrams from existing databases'
 inputs:
   output:
     description: 'output file'
