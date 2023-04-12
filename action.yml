@@ -1,0 +1,37 @@
+name: 'Export MermaidJS erdiagram from DB'
+description: 'Exports entity relationship diagrams from an existing database'
+inputs:
+  output:
+    description: 'output file'
+    required: false
+    default: erdiagram.svg
+  config:
+    description: 'path to Mermerd config file'
+    required: true
+  connectionString:
+    description: 'connectionString'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.20.3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.15.0
+    - name: Install Mermerd
+      shell: bash
+      run: go install github.com/KarnerTh/mermerd@v0.7.0
+    - name: Install mermaid-cli
+      shell: bash
+      run: npm install -g @mermaid-js/mermaid-cli
+    - name: Generate Mermaid ER diagram
+      shell: bash
+      run: mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
+    - name: Convert .mmd to .svg
+      shell: bash
+      run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
