@@ -6,9 +6,9 @@ inputs:
     required: false
     default: erdiagram
   convertTo:
-    description: 'Convert the .mmd file with mermaid-cli. Use .mmd to skip conversion.'
+    description: 'Convert the .mmd file with mermaid-cli. Use `mmd` to skip conversion.'
     required: false
-    default: '.mmd'
+    default: 'mmd'
   config:
     description: 'path to Mermerd config file'
     required: true
@@ -34,12 +34,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: 18.15.0
-      if: inputs.convertTo != '.mmd'
+      if: inputs.convertTo != 'mmd'
     - name: Install mermaid-cli
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
-      if: inputs.convertTo != '.mmd'
+      if: inputs.convertTo != 'mmd'
     - name: Convert .mmd to .svg
       shell: bash
       run: mmdc -i ${{ inputs.output }}.mmd -o ${{ inputs.output }}.${{ inputs.convertTo }}
-      if: inputs.convertTo != '.mmd'
+      if: inputs.convertTo != 'mmd'
