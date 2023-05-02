@@ -1,24 +1,24 @@
 name: 'Export MermaidJS erdiagrams from database'
 description: 'Exports MermaidJS entity relationship diagrams from existing databases'
 inputs:
+  extractFromDB:
+    description: 'Set to false if you already have a .mmd file. Do not forget to set converTo, if set to false'
+    required: false
+    default: true
   filename:
     description: 'The name of the .mmd file'
     required: false
     default: erdiagram
-  extractFromDB:
-    description: 'TODO'
+  config:
+    description: 'Path to a Mermerd config file. Ignored if extractFromDB is false.'
     required: false
-    default: true
+  connectionString:
+    description: 'Connection String for database. Ignored if extractFromDB is false.'
+    required: false
   convertTo:
     description: 'Convert the .mmd file with mermaid-cli. Use `mmd` to skip conversion.'
     required: false
     default: 'mmd'
-  config:
-    description: 'path to Mermerd config file'
-    required: false
-  connectionString:
-    description: 'connectionString'
-    required: false
 runs:
   using: "composite"
   steps:
