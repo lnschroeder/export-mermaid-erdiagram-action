@@ -15,10 +15,12 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
-    - name: Download and extract Mermerd
+    - name: Download Mermerd binary
       shell: bash
-      run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz -O - | \
-        tar -xz -C mermerd/
+      run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
+    - name: Extract Mermerd
+      shell: bash
+      run: tar -xf mermerd_0.7.0_linux_amd64.tar.gz
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
@@ -28,7 +30,7 @@ runs:
       run: npm install -g @mermaid-js/mermaid-cli
     - name: Generate Mermaid ER diagram
       shell: bash
-      run: mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
+      run: ./mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
     - name: Convert .mmd to .svg
       shell: bash
       run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
