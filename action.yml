@@ -2,9 +2,13 @@ name: 'Export MermaidJS erdiagrams from database'
 description: 'Exports MermaidJS entity relationship diagrams from existing databases'
 inputs:
   output:
-    description: 'output file'
+    description: 'Output filename for the .mmd file'
     required: false
-    default: erdiagram.svg
+    default: erdiagram
+  convertTo:
+    description: 'Convert the .mmd file with mermaid-cli. Use .mmd to skip conversion.'
+    required: false
+    default: '.mmd'
   config:
     description: 'path to Mermerd config file'
     required: true
@@ -20,24 +24,22 @@ runs:
       run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
     - name: Extract Mermerd
       shell: bash
-      run: tar -xf mermerd_0.7.0_linux_amd64.tar.gz
+      run: |
+        mkdir mermerd
+        tar -xf mermerd_0.7.0_linux_amd64.tar.gz --directory mermerd
     - name: Generate Mermaid ER diagram
       shell: bash
-      run: ./mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
-    - name: Rename output file
-      shell: bash
-      run: mv erdiagram.mmd ${{ inputs.output }}
-      if: endsWith(${{ inputs.output }}, 'mmd')
+      run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.output }}.mmd
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: 18.15.0
-      if: ${{ !endsWith(inputs.output, 'mmd') }}
+      if: inputs.convertTo != '.mmd'
     - name: Install mermaid-cli
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
-      if: ${{ !endsWith(inputs.output, 'mmd') }}
+      if: inputs.convertTo != '.mmd'
     - name: Convert .mmd to .svg
       shell: bash
-      run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
-      if: ${{ !endsWith(inputs.output, 'mmd') }}
+      run: mmdc -i ${{ inputs.output }}.mmd -o ${{ inputs.output }}.${{ inputs.convertTo }}
+      if: inputs.convertTo != '.mmd'
