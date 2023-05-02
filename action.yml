@@ -32,12 +32,12 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: 18.15.0
-      if: endsWith(${{ inputs.output }}, 'mmd')
+      if: ! endsWith(${{ inputs.output }}, 'mmd')
     - name: Install mermaid-cli
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
-      if: endsWith(${{ inputs.output }}, 'mmd')
+      if: ! endsWith(${{ inputs.output }}, 'mmd')
     - name: Convert .mmd to .svg
       shell: bash
       run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
-      if: endsWith(${{ inputs.output }}, 'mmd')
+      if: ! endsWith(${{ inputs.output }}, 'mmd')
