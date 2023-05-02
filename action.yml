@@ -1,20 +1,23 @@
 name: 'Export MermaidJS erdiagrams from database'
 description: 'Exports MermaidJS entity relationship diagrams from existing databases'
 inputs:
-  output:
+  filename:
     description: 'Output filename for the .mmd file'
     required: false
     default: erdiagram
+  extractFromDB: 'Set this to false if the you already have an .mmd file. You then must specify the convertTo argument.'
+    required: false
+    default: true
   convertTo:
     description: 'Convert the .mmd file with mermaid-cli. Use `mmd` to skip conversion.'
     required: false
     default: 'mmd'
   config:
     description: 'path to Mermerd config file'
-    required: true
+    required: false
   connectionString:
     description: 'connectionString'
-    required: true
+    required: false
 runs:
   using: "composite"
   steps:
@@ -22,6 +25,7 @@ runs:
     - name: Download Mermerd binary
       shell: bash
       run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
+      if: inputs.extractFromDB == true
     - name: Extract Mermerd
       shell: bash
       run: |
@@ -29,7 +33,8 @@ runs:
         tar -xf mermerd_0.7.0_linux_amd64.tar.gz --directory mermerd
     - name: Generate Mermaid ER diagram
       shell: bash
-      run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.output }}.mmd
+      run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.filename }}.mmd
+      if: inputs.extractFromDB == true
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
@@ -41,5 +46,5 @@ runs:
       if: inputs.convertTo != 'mmd'
     - name: Convert .mmd to .svg
       shell: bash
-      run: mmdc -i ${{ inputs.output }}.mmd -o ${{ inputs.output }}.${{ inputs.convertTo }}
+      run: mmdc -i ${{ inputs.filename }}.mmd -o ${{ inputs.filename }}.${{ inputs.convertTo }}
       if: inputs.convertTo != 'mmd'
