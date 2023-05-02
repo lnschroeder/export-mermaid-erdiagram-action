@@ -21,16 +21,23 @@ runs:
     - name: Extract Mermerd
       shell: bash
       run: tar -xf mermerd_0.7.0_linux_amd64.tar.gz
+    - name: Generate Mermaid ER diagram
+      shell: bash
+      run: ./mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
+    - name: Rename output file
+      shell: bash
+      run: mv erdiagram.mmd ${{ inputs.output }}
+      if: ${{ inputs.output == 'mmd' }}
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: 18.15.0
+      if: ${{ inputs.output != 'mmd' }}
     - name: Install mermaid-cli
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
-    - name: Generate Mermaid ER diagram
-      shell: bash
-      run: ./mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
+      if: ${{ inputs.output != 'mmd' }}
     - name: Convert .mmd to .svg
       shell: bash
       run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
+      if: ${{ inputs.output != 'mmd' }}
