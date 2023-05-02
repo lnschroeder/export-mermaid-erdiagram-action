@@ -14,16 +14,15 @@ inputs:
 runs:
   using: "composite"
   env: 
-    MERMERD_VERSION: "0.7.0"
-    MERMERD_TAR: "mermerd_${{ MERMERD_VERSION }}_linux_amd64.tar.gz"
+    MERMERD_VERSION: 0.7.0
   steps:
     - uses: actions/checkout@v3
     - name: Download Mermerd binary
       shell: bash
-      run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v${{ MERMERD_VERSION }}/${{ MERMERD_TAR }}
+      run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v${{ MERMERD_VERSION }}/mermerd_${{ MERMERD_VERSION }}_linux_amd64.tar.gz
     - name: Extract Mermerd
       shell: bash
-      run: tar -xf ${{ MERMERD_TAR }}
+      run: tar -xf mermerd_${{ MERMERD_VERSION }}_linux_amd64.tar.gz
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
