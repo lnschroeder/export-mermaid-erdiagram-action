@@ -26,17 +26,17 @@ runs:
     - name: Download Mermerd binary
       shell: bash
       run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
-      if: inputs.extractFromDB == true
+      if: inputs.extractFromDB
     - name: Extract Mermerd
       shell: bash
       run: |
         mkdir mermerd
         tar -xf mermerd_0.7.0_linux_amd64.tar.gz --directory mermerd
-      if: inputs.extractFromDB == true
+      if: inputs.extractFromDB
     - name: Generate Mermaid ER diagram
       shell: bash
       run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.filename }}.mmd
-      if: inputs.extractFromDB == true
+      if: inputs.extractFromDB
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
