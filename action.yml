@@ -5,6 +5,10 @@ inputs:
     description: 'The name of the .mmd file'
     required: false
     default: erdiagram
+  extractFromDB:
+    description: 'TODO'
+    required: false
+    default: true
   convertTo:
     description: 'Convert the .mmd file with mermaid-cli. Use `mmd` to skip conversion.'
     required: false
@@ -22,14 +26,17 @@ runs:
     - name: Download Mermerd binary
       shell: bash
       run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
+      if: extractFromDB == true
     - name: Extract Mermerd
       shell: bash
       run: |
         mkdir mermerd
         tar -xf mermerd_0.7.0_linux_amd64.tar.gz --directory mermerd
+      if: extractFromDB == true
     - name: Generate Mermaid ER diagram
       shell: bash
       run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.filename }}.mmd
+      if: extractFromDB == true
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
