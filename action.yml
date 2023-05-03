@@ -47,9 +47,6 @@ runs:
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
       if: inputs.convertTo != 'mmd'
-    - name: debugging ls 2
-      shell: bash
-      run: ls -l
     - name: Convert .mmd to .svg
       shell: bash
       run: mmdc -i ${{ inputs.filename }}.mmd -o ${{ inputs.filename }}.${{ inputs.convertTo }}
