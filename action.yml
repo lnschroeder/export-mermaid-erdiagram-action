@@ -1,37 +1,53 @@
 name: 'Export MermaidJS erdiagrams from database'
 description: 'Exports MermaidJS entity relationship diagrams from existing databases'
 inputs:
-  output:
-    description: 'output file'
+  extractFromDB:
+    description: 'Set to false if you already have a .mmd file. Do not forget to set converTo, if set to false'
     required: false
-    default: erdiagram.svg
+    default: true
+  filename:
+    description: 'The name of the .mmd file'
+    required: false
+    default: erdiagram
   config:
-    description: 'path to Mermerd config file'
-    required: true
+    description: 'Path to a Mermerd config file. Ignored if extractFromDB is false.'
+    required: false
   connectionString:
-    description: 'connectionString'
-    required: true
+    description: 'Connection String for database. Ignored if extractFromDB is false.'
+    required: false
+  convertTo:
+    description: 'Convert the .mmd file with mermaid-cli. Use `mmd` to skip conversion.'
+    required: false
+    default: 'mmd'
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
-    - name: Setup Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: 1.20.3
+      if: ${{ inputs.extractFromDB == 'true' }}
+    - name: Download Mermerd binary
+      shell: bash
+      run: wget -c https://github.com/KarnerTh/mermerd/releases/download/v0.7.0/mermerd_0.7.0_linux_amd64.tar.gz
+      if: ${{ inputs.extractFromDB == 'true' }}
+    - name: Extract Mermerd
+      shell: bash
+      run: |
+        mkdir mermerd
+        tar -xf mermerd_0.7.0_linux_amd64.tar.gz --directory mermerd
+      if: ${{ inputs.extractFromDB == 'true' }}
+    - name: Generate Mermaid ER diagram
+      shell: bash
+      run: ./mermerd/mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o ${{ inputs.filename }}.mmd
+      if: ${{ inputs.extractFromDB == 'true' }}
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: 18.15.0
-    - name: Install Mermerd
-      shell: bash
-      run: go install github.com/KarnerTh/mermerd@v0.7.0
+      if: inputs.convertTo != 'mmd'
     - name: Install mermaid-cli
       shell: bash
       run: npm install -g @mermaid-js/mermaid-cli
-    - name: Generate Mermaid ER diagram
-      shell: bash
-      run: mermerd --runConfig ${{ inputs.config }} -c ${{ inputs.connectionString }} -o erdiagram.mmd
+      if: inputs.convertTo != 'mmd'
     - name: Convert .mmd to .svg
       shell: bash
-      run: mmdc -i erdiagram.mmd -o ${{ inputs.output }}
+      run: mmdc -i ${{ inputs.filename }}.mmd -o ${{ inputs.filename }}.${{ inputs.convertTo }}
+      if: inputs.convertTo != 'mmd'
